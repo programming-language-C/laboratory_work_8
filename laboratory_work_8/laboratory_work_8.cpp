@@ -4,67 +4,75 @@
 #include <string>
 #include <fstream>
 #include <nlohmann/json.hpp>
-#include "struct_mapping/struct_mapping.h"
 using namespace std;
 using namespace nlohmann;
-#define N 2
+
+//используется при создании рандомных значений
+#define numberOfRecords 2
 
 struct WorkInWorkshop
 {
 	int orderNumber[4];
-	string performerServiceNumber[6];
-	int jobСode[3];
-	string unit[5];
+	int performerServiceNumber[6];
+	int jobCode[3];
+	int unit[5];
 	float normOfTime[3];
 	float price[3];
 	int numberCompletedUnitsMeasure[3];
 	float costWork;
 };
 
-void menu();
+void menu(WorkInWorkshop* workshopData, WorkInWorkshop* dataOfSelectedPerformers, string fileName);
 string getFileName();
-void addNote(WorkInWorkshop workshopData[N], string nameFile);
-void closeProgram(WorkInWorkshop workshopData[N], string nameFile);
-void createOrOpenWorkInWorkshop(WorkInWorkshop workshopData[N], string nameFile = "Work in workshop.json");
-void openWorkInWorkshop(string nameFile = "Work in workshop.json");
-json getWorkInWorkshop(string nameFile);
-void serializeWorkInWorkshop(WorkInWorkshop workshopData[N], json workInWorkshop, int i);
+int getAmountWorkInWorkshop(string fileName);
+void addNote(WorkInWorkshop* workshopData, string fileName);
+void closeProgram();
+void createOrOpenWorkInWorkshop(WorkInWorkshop* workshopData, string fileName);
+void openWorkInWorkshop(WorkInWorkshop* workshopData, string fileName);
+json getWorkInWorkshop(string fileName);
+void serializeWorkInWorkshop(WorkInWorkshop* workshopData, json workInWorkshop, int i);
 void addFromJsonToWorkInWorkshop(int key, string item); //???
-void createWorkInWorkshop(WorkInWorkshop workshopData[N], string nameFile);
-string requestPerformerServiceNumberForCreateWorkshopData(int index);
-void menu();
+void createWorkInWorkshop(WorkInWorkshop* workshopData, string fileName);
+void generateRandomData(WorkInWorkshop* workshopData, json jsonData, int amountWorkInWorkshop);
+int requestPerformerServiceNumberForCreateWorkshopData(int index);
 string getRandomStr(int sizeStr);
-void createJsonFile(json jsonData, string nameFile);
-void printWorkInWorkshop(WorkInWorkshop workshopData[N]);
-void requestPerformerServiceNumber(WorkInWorkshop workshopData[N],
-                                   WorkInWorkshop dataOfSelectedPerformers[N]);
-void findCopyAndPrintSelectedArtist(WorkInWorkshop workshopData[N],
-                                    WorkInWorkshop dataOfSelectedPerformers[N],
-                                    string requestedServiceNumber);
+void createJsonFile(json jsonData, string fileName);
+void printWorkInWorkshop(WorkInWorkshop* workshopData, string fileName);
+void requestPerformerServiceNumber(WorkInWorkshop* workshopData,
+                                   WorkInWorkshop* dataOfSelectedPerformers,
+                                   string fileName);
+void findCopyAndPrintSelectedArtist(WorkInWorkshop* workshopData,
+                                    WorkInWorkshop* dataOfSelectedPerformers,
+                                    int requestedServiceNumber,
+                                    string fileName);
 void copySelectedArtist(WorkInWorkshop* workshopData,
                         WorkInWorkshop* dataOfSelectedPerformers,
                         int numberOfLoopExecution,
                         int i);
-void printSelectedArtist(WorkInWorkshop dataOfSelectedPerformers[N],
-                         string previousPerformerServiceNumber,
+void printSelectedArtist(WorkInWorkshop* dataOfSelectedPerformers,
+                         int previousPerformerServiceNumber,
                          int index);
-void printRecords(WorkInWorkshop dataOfSelectedPerformers[N], int serialNumber);
+void printRecords(WorkInWorkshop* dataOfSelectedPerformers, int serialNumber);
 void printTotalCostOfWork(float totalCostOfWork);
-void printServiceNumberFieldsAndRecords(WorkInWorkshop dataOfSelectedPerformers[N], int serialNumber);
-void printServiceNumberAndFields(WorkInWorkshop dataOfSelectedPerformers[N], int serialNumber);
+void printServiceNumberFieldsAndRecords(WorkInWorkshop* dataOfSelectedPerformers, int serialNumber);
+void printServiceNumberAndFields(WorkInWorkshop* dataOfSelectedPerformers, int serialNumber);
 void printTimeOfExecutionOfListedWorks(float timeOfExecutionOfListedWorks);
-
-void (*action[3])(WorkInWorkshop[N], string) = {createOrOpenWorkInWorkshop, addNote, closeProgram};
 
 int main()
 {
-	WorkInWorkshop workshopData[N], dataOfSelectedPerformers[N];
+	string fileName;
+	int amountWorkInWorkshop;
 	json jsonData;
 
 	srand(time(NULL));
 	setlocale(LC_ALL, "ru");
 
-	menu();
+	fileName = getFileName();
+	amountWorkInWorkshop = getAmountWorkInWorkshop(fileName);
+	WorkInWorkshop *workshopData = new WorkInWorkshop[100],
+	               *dataOfSelectedPerformers = new WorkInWorkshop[100];
+	createOrOpenWorkInWorkshop(workshopData, fileName);
+	menu(workshopData, dataOfSelectedPerformers, fileName);
 
 	//createOrOpenWorkInWorkshop(workshopData);
 	//json jsonData = createWorkInWorkshop(workshopData);
@@ -80,28 +88,56 @@ int main()
 	return 0;
 }
 
-void menu()
+//void (*action[4])(WorkInWorkshop , string) = {
+//	openWorkInWorkshop,
+//	requestPerformerServiceNumber,
+//	addNote,
+//	closeProgram
+//};
+
+void menu(WorkInWorkshop* workshopData, WorkInWorkshop* dataOfSelectedPerformers, string fileName)
 {
 	int menuNumber;
-	bool isValidMenuNumber;
-	WorkInWorkshop workshopData[N];
-	string fileName = getFileName();
+	//bool isValidMenuNumber;
 
 	while (1)
 	{
-		while (1)
+		/*while (1)
 		{
-			cout << "1 - Посмотреть файл" << endl;
+			cout << "\n1 - Посмотреть файл" << endl;
 			cout << "2 - Добавить запись" << endl;
-			cout << "3 - Закрыть программу" << endl;
+			cout << "3 - Проанализировать исполнителей" << endl;
+			cout << "4 - Закрыть программу" << endl;
 			cout << "Введите номер пункта меню: ";
 			cin >> menuNumber;
 
 			isValidMenuNumber = menuNumber >= 1 && menuNumber <= 3;
 			if (isValidMenuNumber) break;
 			cout << "\nОшибка в номере!!! Повторите ввод!";
+		}*/
+		//action[menuNumber - 1](workshopData, fileName);
+		cout << "\n1 - Посмотреть файл" << endl;
+		//cout << "2 - Добавить запись" << endl;
+		cout << "2 - Проанализировать исполнителей" << endl;
+		cout << "3 - Закрыть программу" << endl;
+		cout << "\nВведите номер пункта меню: ";
+		cin >> menuNumber;
+
+		switch (menuNumber)
+		{
+		case 1:
+			createOrOpenWorkInWorkshop(workshopData, fileName);
+			break;
+		case 4:
+			addNote(workshopData, fileName);
+			break;
+		case 2:
+			requestPerformerServiceNumber(workshopData, dataOfSelectedPerformers, fileName);
+			break;
+		case 3:
+			closeProgram();
+			break;
 		}
-		action[menuNumber - 1](workshopData, fileName);
 	}
 }
 
@@ -120,107 +156,318 @@ string getFileName()
 		{
 			cout << "\nВведите новое имя файла: ";
 			cin >> fileName;
-			fileName += fileType;
 			break;
 		}
-		if (changeFileName == "n")
-			break;
+		if (changeFileName == "n") break;
 		if (changeFileName != "y" && changeFileName != "n")
 			cout << "Не корректный ввод" << endl;
 	}
+	fileName += fileType;
 	return fileName;
 }
 
-void addNote(WorkInWorkshop workshopData[N], string nameFile)
+int getAmountWorkInWorkshop(string fileName)
 {
+	json workInWorkshop = getWorkInWorkshop(fileName);
+	bool isErrorFileNotFound = workInWorkshop.contains("Error file not found");
+	//cout << "Error in getAmountWorkInWorkshop?" << endl;
+	int amountWorkInWorkshop;
+
+	if (isErrorFileNotFound)
+		return numberOfRecords;
+
+	amountWorkInWorkshop = workInWorkshop.size();
+	return amountWorkInWorkshop;
+}
+
+void addNote(WorkInWorkshop* workshopData, string fileName)
+{
+	int orderNumber[4];
+	int performerServiceNumber[6];
+	int jobCode[3];
+	int unit[5];
+	float normOfTime[3];
+	float price[3];
+	int numberCompletedUnitsMeasure[3];
+	float costWork;
+
+	json workInWorkshop = getWorkInWorkshop(fileName);
+
+	cout << "Введите данные" << endl;
+
+	cout << "Номер наряда (целые числа, небольше 4 символов):" << endl;
+	cin >> *orderNumber;
+	//scanf_s("%d", orderNumber);
+
+	cout << "Табельный номер исполнителя (строка, небольше 6 символов):" << endl;
+	cin >> *performerServiceNumber;
+	//scanf_s("%s", performerServiceNumber);
+
+	cout << "Код работы (целые числа, небольше 3 символов):" << endl;
+	cin >> *jobCode;
+	//scanf_s("%d", jobCode);
+
+	cout << "Единица измерения (строка, небольше 5 символов):" << endl;
+	cin >> *unit;
+	//scanf_s("%s", unit);
+
+	cout << "Норма времени ч. (вещественное число, небольше 3 символов):" << endl;
+	cin >> *normOfTime;
+	//scanf_s("%f", normOfTime);
+
+	cout << "Расценка руб. коп. (вещественное число, небольше 3 символов):" << endl;
+	cin >> *price;
+	//scanf_s("%f", price);
+
+	cout << "Расценка руб. коп. (целое число, небольше 3 символов):" << endl;
+	cin >> *numberCompletedUnitsMeasure;
+	//scanf_s("%d", numberCompletedUnitsMeasure);
+
+	costWork = *price * *numberCompletedUnitsMeasure;
+
+	//cout << workInWorkshop << endl;
+	json enteredData{
+		{"orderNumber", *orderNumber},
+		{"performerServiceNumber", *performerServiceNumber},
+		{"jobCode", *jobCode},
+		{"unit", *unit},
+		{"normOfTime", *normOfTime},
+		{"price", *price},
+		{"numberCompletedUnitsMeasure", *numberCompletedUnitsMeasure},
+		{"costWork", costWork}
+	};
+
+	workInWorkshop.insert(workInWorkshop.end(), enteredData);
+	createJsonFile(workInWorkshop, fileName);
+
+	cout << workInWorkshop;
+
+
+	//нужно ли это???!!!!!!!!!!!!!!!!!!
+	cout << "\nФункция addNote\nfileName = " << fileName << endl;
+	int indexNewWorkInWorkshop = getAmountWorkInWorkshop(fileName) - 1;
+	cout << "indexNeWWorkInWorkshop = " << indexNewWorkInWorkshop << endl;
+	serializeWorkInWorkshop(workshopData, workInWorkshop, indexNewWorkInWorkshop);
+
+	cout << "workshopData: \n" << workshopData;
+
+	/*ofstream
+	ifstream jsonFile(fileName, ifstream::binary);
+	jsonFile << workInWorkshop;*/
+	//cout << enteredData;
 	cout << "Запись успешно добавлена" << endl;
 }
 
-void closeProgram(WorkInWorkshop workshopData[N], string nameFile)
+void addNoteInJsonFile()
+{
+}
+
+void closeProgram()
 {
 	cout << "Программа завершилась";
 	exit(0);
 }
 
-void createOrOpenWorkInWorkshop(WorkInWorkshop workshopData[N], string nameFile)
+void createOrOpenWorkInWorkshop(WorkInWorkshop* workshopData, string fileName)
 {
-	ifstream jsonFile(nameFile, ifstream::binary);
+	ifstream jsonFile(fileName, ifstream::binary);
 	bool isOpen = jsonFile.is_open();
+	jsonFile.close();
 
 	if (isOpen)
-		openWorkInWorkshop(nameFile);
+		openWorkInWorkshop(workshopData, fileName);
 	else
-		createWorkInWorkshop(workshopData, nameFile);
+		createWorkInWorkshop(workshopData, fileName);
+	
 }
 
-void openWorkInWorkshop(string nameFile)
+void openWorkInWorkshop(WorkInWorkshop* workshopData, string fileName)
 {
-	WorkInWorkshop workshopData[N];
-	json workInWorkshop = getWorkInWorkshop(nameFile);
-	int amountWorkInWorkshop = workInWorkshop.size();
-
+	int amountWorkInWorkshop = getAmountWorkInWorkshop(fileName);
+	json workInWorkshop = getWorkInWorkshop(fileName);
+	
 	for (int i = 0; i < amountWorkInWorkshop; i++)
 		serializeWorkInWorkshop(workshopData, workInWorkshop, i);
-	printWorkInWorkshop(workshopData);
+	cout << "openWorkInWorkshop: \n";
+	printWorkInWorkshop(workshopData, fileName);
 }
 
-json getWorkInWorkshop(string nameFile)
+json getWorkInWorkshop(string fileName)
 {
-	ifstream jsonFile(nameFile, ifstream::binary);
-	json jsonData = json::parse(jsonFile);
-	return jsonData;
+	ifstream jsonFile(fileName, ifstream::binary);
+	bool isOpen = jsonFile.is_open();
+	//jsonFile.close();
+
+	if (isOpen)
+	{
+		json jsonData = json::parse(jsonFile);
+		jsonFile.close();
+		return jsonData;
+	}
+	jsonFile.close();
+	return {{"Error file not found", true}};
 }
 
-void serializeWorkInWorkshop(WorkInWorkshop workshopData[N], json workInWorkshop, int i)
+void serializeWorkInWorkshop(WorkInWorkshop* workshopData, json workInWorkshop, int i)
 {
+	cout << "serializeWorkInWorkshop\nworkInWorkshop: \n\n" << workInWorkshop << endl;
+	//workshopData пустой при добавлении записи?
+	//ГДЕ ТУТ ОШИБКА?
+	//cout << "json: \n" << workInWorkshop << endl;
+	//cout << "i = " << i << endl;
+
+	//int orderNumber = workInWorkshop[i]["orderNumber"].get<int>();
+	//Ошибка: JSON_THROW(type_error::create(302, concat("type must be number, but is ", j.type_name()), &j));
+	int performerServiceNumber = workInWorkshop[i]["performerServiceNumber"];
+	//int jobCode[3];
+	int unit = workInWorkshop[i]["unit"].get<int>();
+	/*float normOfTime[3];
+	float price[3];
+	int numberCompletedUnitsMeasure[3];
+	float costWork;*/
+
 	*workshopData[i].orderNumber = workInWorkshop[i]["orderNumber"].get<int>();
-	*workshopData[i].performerServiceNumber = workInWorkshop[i]["performerServiceNumber"].get<string>();
-	*workshopData[i].jobСode = workInWorkshop[i]["jobCode"].get<int>();
-	*workshopData[i].unit = workInWorkshop[i]["unit"].get<string>();
+	//cout << "orderNumber: " << *workshopData[i].orderNumber << endl;
+
+	//тут проблема и. Скорее всего тип который берём это int, а не string (если так то не работает)
+
+	//работает
+	//*workshopData[i].performerServiceNumber = "test";
+
+	//не работает.
+	//РЕШЕНА))))))
+	*workshopData[i].performerServiceNumber = performerServiceNumber;
+	//cout << "performerServiceNumber: " << workInWorkshop[i]["performerServiceNumber"].get<int>() << endl;
+
+	*workshopData[i].jobCode = workInWorkshop[i]["jobCode"].get<int>();
+	//cout << "jobCode: " << *workshopData[i].jobCode << endl;
+
+	//и тут проблема:)
+	//А тут ещё не решена ((((
+	*workshopData[i].unit = unit;
+	//cout << "unit: " << workInWorkshop[i]["unit"].get<int>() << endl;
+
 	*workshopData[i].normOfTime = workInWorkshop[i]["normOfTime"].get<float>();
+	//cout << "normOfTime: " << *workshopData[i].normOfTime << endl;
+
 	*workshopData[i].price = workInWorkshop[i]["price"].get<float>();
+	//cout << "price: " << *workshopData[i].price << endl;
+
 	*workshopData[i].numberCompletedUnitsMeasure = workInWorkshop[i]["numberCompletedUnitsMeasure"].get<int>();
+	//cout << "numberCompletedUnitsMeasure: " << *workshopData[i].numberCompletedUnitsMeasure << endl;
+
 	workshopData[i].costWork = workInWorkshop[i]["costWork"].get<float>();
+	//cout << "costWork: " << workshopData[i].costWork << endl;
 }
 
 void addFromJsonToWorkInWorkshop(int key, string item)
 {
 }
 
-void createWorkInWorkshop(WorkInWorkshop workshopData[N], string nameFile)
+void createWorkInWorkshop(WorkInWorkshop* workshopData, string fileName)
 {
-	string performerServiceNumber;
+	int amountWorkInWorkshop = getAmountWorkInWorkshop(fileName);
+	//int performerServiceNumber;
 	json jsonData{};
+	float costWork;
+	string userResponse;
 
-	for (int i = 0; i < N; i++)
+	while (1)
 	{
-		*workshopData[i].orderNumber = rand() % 9999;
+		cout << "Хотите чтобы данные заполнились рандомно? (y/n): ";
+		cin >> userResponse;
 
-		performerServiceNumber = requestPerformerServiceNumberForCreateWorkshopData(i);
-		*workshopData[i].performerServiceNumber = performerServiceNumber;
+		if (userResponse == "y")
+		{
+			int performerServiceNumber;
 
-		*workshopData[i].jobСode = rand() % 999;
-		*workshopData[i].unit = getRandomStr(5);
-		*workshopData[i].normOfTime = (float)(rand()) / ((float)(RAND_MAX / 9));
-		*workshopData[i].price = (float)(rand()) / ((float)(RAND_MAX / 9));
-		*workshopData[i].numberCompletedUnitsMeasure = rand() % 999;
-		workshopData[i].costWork = *workshopData[i].price * *workshopData[i].numberCompletedUnitsMeasure;
+			for (int i = 0; i < amountWorkInWorkshop; i++)
+			{
+				*workshopData[i].orderNumber = rand() % 9999;
 
-		jsonData[i]["orderNumber"] = *workshopData[i].orderNumber;
-		jsonData[i]["performerServiceNumber"] = performerServiceNumber;
-		jsonData[i]["jobCode"] = *workshopData[i].jobСode;
-		jsonData[i]["unit"] = *workshopData[i].unit;
-		jsonData[i]["normOfTime"] = *workshopData[i].normOfTime;
-		jsonData[i]["price"] = *workshopData[i].price;
-		jsonData[i]["numberCompletedUnitsMeasure"] = *workshopData[i].numberCompletedUnitsMeasure;
-		jsonData[i]["costWork"] = workshopData[i].costWork;
+				performerServiceNumber = requestPerformerServiceNumberForCreateWorkshopData(i);
+				*workshopData[i].performerServiceNumber = performerServiceNumber;
+
+				*workshopData[i].jobCode = rand() % 999;
+				//*workshopData[i].unit = getRandomStr(5);
+				*workshopData[i].unit = rand() % 9999;
+				*workshopData[i].normOfTime = (float)(rand()) / ((float)(RAND_MAX / 9));
+				*workshopData[i].price = (float)(rand()) / ((float)(RAND_MAX / 9));
+				*workshopData[i].numberCompletedUnitsMeasure = rand() % 999;
+				workshopData[i].costWork = *workshopData[i].price * *workshopData[i].numberCompletedUnitsMeasure;
+
+				jsonData[i]["orderNumber"] = *workshopData[i].orderNumber;
+				jsonData[i]["performerServiceNumber"] = performerServiceNumber;
+				jsonData[i]["jobCode"] = *workshopData[i].jobCode;
+				jsonData[i]["unit"] = *workshopData[i].unit;
+				jsonData[i]["normOfTime"] = *workshopData[i].normOfTime;
+				jsonData[i]["price"] = *workshopData[i].price;
+				jsonData[i]["numberCompletedUnitsMeasure"] = *workshopData[i].numberCompletedUnitsMeasure;
+				jsonData[i]["costWork"] = workshopData[i].costWork;
+			}
+			break;
+		}
+
+		if (userResponse == "n")
+		{
+			int orderNumber[4];
+			int performerServiceNumber[6];
+			int jobCode[3];
+			int unit[5];
+			float normOfTime[3];
+			float price[3];
+			int numberCompletedUnitsMeasure[3];
+			float costWork;
+
+			for (int i = 0; i < amountWorkInWorkshop; i++)
+			{
+				cout << "Введите данные" << endl;
+
+				cout << "Номер наряда (целые числа, небольше 4 символов):" << endl;
+				cin >> *orderNumber;
+
+				cout << "Табельный номер исполнителя (строка, небольше 6 символов):" << endl;
+				cin >> *performerServiceNumber;
+
+				cout << "Код работы (целые числа, небольше 3 символов):" << endl;
+				cin >> *jobCode;
+
+				cout << "Единица измерения (строка, небольше 5 символов):" << endl;
+				cin >> *unit;
+
+				cout << "Норма времени ч. (вещественное число, небольше 3 символов):" << endl;
+				cin >> *normOfTime;
+
+				cout << "Расценка руб. коп. (вещественное число, небольше 3 символов):" << endl;
+				cin >> *price;
+
+				cout << "Расценка руб. коп. (целое число, небольше 3 символов):" << endl;
+				cin >> *numberCompletedUnitsMeasure;
+
+				costWork = *price * *numberCompletedUnitsMeasure;
+
+				jsonData[i]["orderNumber"] = *orderNumber;
+				jsonData[i]["performerServiceNumber"] = *performerServiceNumber;
+				jsonData[i]["jobCode"] = *jobCode;
+				jsonData[i]["unit"] = *unit;
+				jsonData[i]["normOfTime"] = *normOfTime;
+				jsonData[i]["price"] = *price;
+				jsonData[i]["numberCompletedUnitsMeasure"] = *numberCompletedUnitsMeasure;
+				jsonData[i]["costWork"] = costWork;
+			}
+			break;
+		}
+
+		if (userResponse != "y" && userResponse != "n")
+			cout << "Не корректный ввод" << endl;
 	}
-	createJsonFile(jsonData, nameFile);
+	cout << "jsonData: " << jsonData << endl;
+	createJsonFile(jsonData, fileName);
 }
 
-string requestPerformerServiceNumberForCreateWorkshopData(int index)
+int requestPerformerServiceNumberForCreateWorkshopData(int index)
 {
-	string performerServiceNumber;
+	int performerServiceNumber;
 	cout << "Введите Таб. № испол. " << index + 1 << endl;
 	cin >> performerServiceNumber;
 	return performerServiceNumber;
@@ -241,17 +488,18 @@ string getRandomStr(int sizeStr)
 	return randomStr;
 }
 
-void createJsonFile(json jsonData, string nameFile)
+void createJsonFile(json jsonData, string fileName)
 {
-	ofstream jsonFile(nameFile);
+	ofstream jsonFile(fileName);
 	jsonFile << jsonData;
+	cout << "Файл " << fileName << " успешно создан" << endl;
 	jsonFile.close();
-
-	cout << "Файл " << nameFile << " успешно создан" << endl;
 }
 
-void printWorkInWorkshop(WorkInWorkshop workshopData[N])
+void printWorkInWorkshop(WorkInWorkshop* workshopData, string fileName)
 {
+	int amountWorkshopData = getAmountWorkInWorkshop(fileName);
+
 	cout
 		<< "\n"
 		<< left
@@ -266,13 +514,14 @@ void printWorkInWorkshop(WorkInWorkshop workshopData[N])
 		<< setw(34) << "|Стоимость работы (р/к)|"
 		<< endl;
 
-	for (int i = 0; i < N; i++)
+	//cout << "amountWorkshopData sizeof: " << amountWorkshopData << endl;
+	for (int i = 0; i < amountWorkshopData; i++)
 	{
 		cout
 			<< setw(4) << i + 1
 			<< setw(10) << *workshopData[i].orderNumber
 			<< setw(15) << *workshopData[i].performerServiceNumber
-			<< setw(12) << *workshopData[i].jobСode
+			<< setw(12) << *workshopData[i].jobCode
 			<< setw(10) << *workshopData[i].unit
 			<< setw(13) << *workshopData[i].normOfTime
 			<< setw(16) << *workshopData[i].price
@@ -282,7 +531,9 @@ void printWorkInWorkshop(WorkInWorkshop workshopData[N])
 	}
 }
 
-void requestPerformerServiceNumber(WorkInWorkshop workshopData[N], WorkInWorkshop dataOfSelectedPerformers[N])
+void requestPerformerServiceNumber(WorkInWorkshop* workshopData,
+                                   WorkInWorkshop* dataOfSelectedPerformers,
+                                   string fileName)
 {
 	string requestedServiceNumber;
 	bool isEnd;
@@ -295,19 +546,20 @@ void requestPerformerServiceNumber(WorkInWorkshop workshopData[N], WorkInWorksho
 		if (isEnd) break;
 		findCopyAndPrintSelectedArtist(workshopData,
 		                               dataOfSelectedPerformers,
-		                               requestedServiceNumber);
+		                               stoi(requestedServiceNumber),
+		                               fileName);
 	}
 }
 
-void copySelectedArtist(WorkInWorkshop workshopData[N],
-                        WorkInWorkshop dataOfSelectedPerformers[N],
+void copySelectedArtist(WorkInWorkshop* workshopData,
+                        WorkInWorkshop* dataOfSelectedPerformers,
                         int numberOfLoopExecution,
                         int i)
 {
 	*dataOfSelectedPerformers[numberOfLoopExecution].orderNumber = *workshopData[i].orderNumber;
 	*dataOfSelectedPerformers[numberOfLoopExecution].performerServiceNumber = *workshopData[i].
 		performerServiceNumber;
-	*dataOfSelectedPerformers[numberOfLoopExecution].jobСode = *workshopData[i].jobСode;
+	*dataOfSelectedPerformers[numberOfLoopExecution].jobCode = *workshopData[i].jobCode;
 	*dataOfSelectedPerformers[numberOfLoopExecution].unit = *workshopData[i].unit;
 	*dataOfSelectedPerformers[numberOfLoopExecution].normOfTime = *workshopData[i].normOfTime;
 	*dataOfSelectedPerformers[numberOfLoopExecution].price = *workshopData[i].price;
@@ -316,18 +568,20 @@ void copySelectedArtist(WorkInWorkshop workshopData[N],
 	dataOfSelectedPerformers[numberOfLoopExecution].costWork = workshopData[i].costWork;
 }
 
-void findCopyAndPrintSelectedArtist(WorkInWorkshop workshopData[N],
-                                    WorkInWorkshop dataOfSelectedPerformers[N],
-                                    string requestedServiceNumber)
+void findCopyAndPrintSelectedArtist(WorkInWorkshop* workshopData,
+                                    WorkInWorkshop* dataOfSelectedPerformers,
+                                    int requestedServiceNumber,
+                                    string fileName)
 {
 	bool isFoundPerformerServiceNumber;
-	string performerServiceNumber,
-	       previousPerformerServiceNumber;
-	int numberOfLoopExecution = 0;
+	int performerServiceNumber,
+	    previousPerformerServiceNumber = NULL;
+	int amountWorkshopData = getAmountWorkInWorkshop(fileName),
+	    numberOfLoopExecution = 0;
 	float totalCostOfWork = 0,
 	      timeOfExecutionOfListedWorks = 0;
 
-	for (int i = 0; i < N; i++)
+	for (int i = 0; i < amountWorkshopData; i++)
 	{
 		performerServiceNumber = *workshopData[i].performerServiceNumber;
 		isFoundPerformerServiceNumber = requestedServiceNumber == performerServiceNumber;
@@ -351,11 +605,11 @@ void findCopyAndPrintSelectedArtist(WorkInWorkshop workshopData[N],
 	printTimeOfExecutionOfListedWorks(timeOfExecutionOfListedWorks);
 }
 
-void printSelectedArtist(WorkInWorkshop dataOfSelectedPerformers[N],
-                         string previousPerformerServiceNumber,
+void printSelectedArtist(WorkInWorkshop* dataOfSelectedPerformers,
+                         int previousPerformerServiceNumber,
                          int index)
 {
-	string currentPerformerServiceNumber;
+	int currentPerformerServiceNumber;
 	bool isSameServiceNumber;
 
 	currentPerformerServiceNumber = *dataOfSelectedPerformers[index].performerServiceNumber;
@@ -366,14 +620,14 @@ void printSelectedArtist(WorkInWorkshop dataOfSelectedPerformers[N],
 		printServiceNumberFieldsAndRecords(dataOfSelectedPerformers, index);
 }
 
-void printRecords(WorkInWorkshop dataOfSelectedPerformers[N], int serialNumber)
+void printRecords(WorkInWorkshop* dataOfSelectedPerformers, int serialNumber)
 {
 	cout
 		<< "\n"
 		<< left
 		<< setw(4) << serialNumber + 1
 		<< setw(10) << *dataOfSelectedPerformers[serialNumber].orderNumber
-		<< setw(12) << *dataOfSelectedPerformers[serialNumber].jobСode
+		<< setw(12) << *dataOfSelectedPerformers[serialNumber].jobCode
 		<< setw(10) << *dataOfSelectedPerformers[serialNumber].unit
 		<< setw(13) << *dataOfSelectedPerformers[serialNumber].normOfTime
 		<< setw(16) << *dataOfSelectedPerformers[serialNumber].price
@@ -392,13 +646,13 @@ void printTotalCostOfWork(float totalCostOfWork)
 		<< endl;
 }
 
-void printServiceNumberFieldsAndRecords(WorkInWorkshop dataOfSelectedPerformers[N], int serialNumber)
+void printServiceNumberFieldsAndRecords(WorkInWorkshop* dataOfSelectedPerformers, int serialNumber)
 {
 	printServiceNumberAndFields(dataOfSelectedPerformers, serialNumber);
 	printRecords(dataOfSelectedPerformers, serialNumber);
 }
 
-void printServiceNumberAndFields(WorkInWorkshop dataOfSelectedPerformers[N], int serialNumber)
+void printServiceNumberAndFields(WorkInWorkshop* dataOfSelectedPerformers, int serialNumber)
 {
 	cout
 		<< "\nСведения о прохождении нарядов для исполнителя с табельным номером "
