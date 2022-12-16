@@ -71,53 +71,19 @@ int main()
 	amountWorkInWorkshop = getAmountWorkInWorkshop(fileName);
 	vector <WorkInWorkshop> workshopData,
 	                       dataOfSelectedPerformers;
-	//WorkInWorkshop *workshopData = new WorkInWorkshop[100],
-	//               *dataOfSelectedPerformers = new WorkInWorkshop[100];
 	createOrOpenWorkInWorkshop(workshopData, fileName);
 	menu(workshopData, dataOfSelectedPerformers, fileName);
-
-	//createOrOpenWorkInWorkshop(workshopData);
-	//json jsonData = createWorkInWorkshop(workshopData);
-	//openWorkInWorkshop();
-	//jsonData = getWorkInWorkshop();
-	//createJsonFile(jsonData);
-
-
-	//printWorkInWorkshop(workshopData);
-	//requestPerformerServiceNumber(workshopData, dataOfSelectedPerformers);
 
 	system("PAUSE");
 	return 0;
 }
 
-//void (*action[4])(WorkInWorkshop , string) = {
-//	openWorkInWorkshop,
-//	requestPerformerServiceNumber,
-//	addNote,
-//	closeProgram
-//};
-
 void menu(vector <WorkInWorkshop>& workshopData, vector <WorkInWorkshop>& dataOfSelectedPerformers, string fileName)
 {
 	int menuNumber;
-	//bool isValidMenuNumber;
 
 	while (1)
 	{
-		/*while (1)
-		{
-			cout << "\n1 - Посмотреть файл" << endl;
-			cout << "2 - Добавить запись" << endl;
-			cout << "3 - Проанализировать исполнителей" << endl;
-			cout << "4 - Закрыть программу" << endl;
-			cout << "Введите номер пункта меню: ";
-			cin >> menuNumber;
-
-			isValidMenuNumber = menuNumber >= 1 && menuNumber <= 3;
-			if (isValidMenuNumber) break;
-			cout << "\nОшибка в номере!!! Повторите ввод!";
-		}*/
-		//action[menuNumber - 1](workshopData, fileName);
 		cout << "\n1 - Посмотреть файл" << endl;
 		cout << "2 - Добавить запись" << endl;
 		cout << "3 - Проанализировать исполнителей" << endl;
@@ -172,7 +138,6 @@ int getAmountWorkInWorkshop(string fileName)
 {
 	json workInWorkshop = getWorkInWorkshop(fileName);
 	bool isErrorFileNotFound = workInWorkshop.contains("Error file not found");
-	//cout << "Error in getAmountWorkInWorkshop?" << endl;
 	int amountWorkInWorkshop;
 
 	if (isErrorFileNotFound)
@@ -193,41 +158,35 @@ void addNote(vector <WorkInWorkshop>& workshopData, string fileName)
 	int numberCompletedUnitsMeasure[3];
 	float costWork;
 
+	int indexNewWorkInWorkshop;
+
 	json workInWorkshop = getWorkInWorkshop(fileName);
 
 	cout << "Введите данные" << endl;
 
 	cout << "Номер наряда (целые числа, небольше 4 символов):" << endl;
 	cin >> *orderNumber;
-	//scanf_s("%d", orderNumber);
 
 	cout << "Табельный номер исполнителя (строка, небольше 6 символов):" << endl;
 	cin >> *performerServiceNumber;
-	//scanf_s("%s", performerServiceNumber);
 
 	cout << "Код работы (целые числа, небольше 3 символов):" << endl;
 	cin >> *jobCode;
-	//scanf_s("%d", jobCode);
 
 	cout << "Единица измерения (строка, небольше 5 символов):" << endl;
 	cin >> *unit;
-	//scanf_s("%s", unit);
 
 	cout << "Норма времени ч. (вещественное число, небольше 3 символов):" << endl;
 	cin >> *normOfTime;
-	//scanf_s("%f", normOfTime);
 
 	cout << "Расценка руб. коп. (вещественное число, небольше 3 символов):" << endl;
 	cin >> *price;
-	//scanf_s("%f", price);
 
 	cout << "Расценка руб. коп. (целое число, небольше 3 символов):" << endl;
 	cin >> *numberCompletedUnitsMeasure;
-	//scanf_s("%d", numberCompletedUnitsMeasure);
 
 	costWork = *price * *numberCompletedUnitsMeasure;
 
-	//cout << workInWorkshop << endl;
 	json enteredData{
 		{"orderNumber", *orderNumber},
 		{"performerServiceNumber", *performerServiceNumber},
@@ -242,26 +201,10 @@ void addNote(vector <WorkInWorkshop>& workshopData, string fileName)
 	workInWorkshop.insert(workInWorkshop.end(), enteredData);
 	createJsonFile(workInWorkshop, fileName);
 
-	cout << workInWorkshop;
-
-
-	//нужно ли это???!!!!!!!!!!!!!!!!!!
-	cout << "\nФункция addNote\nfileName = " << fileName << endl;
-	int indexNewWorkInWorkshop = getAmountWorkInWorkshop(fileName) - 1;
-	cout << "indexNeWWorkInWorkshop = " << indexNewWorkInWorkshop << endl;
+	indexNewWorkInWorkshop = getAmountWorkInWorkshop(fileName) - 1;
 	serializeWorkInWorkshop(workshopData, workInWorkshop, indexNewWorkInWorkshop);
 
-	//cout << "workshopData: \n" << workshopData;
-
-	/*ofstream
-	ifstream jsonFile(fileName, ifstream::binary);
-	jsonFile << workInWorkshop;*/
-	//cout << enteredData;
 	cout << "Запись успешно добавлена" << endl;
-}
-
-void addNoteInJsonFile()
-{
 }
 
 void closeProgram()
@@ -286,10 +229,8 @@ void openWorkInWorkshop(vector <WorkInWorkshop>& workshopData, string fileName)
 {
 	int amountWorkInWorkshop = getAmountWorkInWorkshop(fileName);
 	json workInWorkshop = getWorkInWorkshop(fileName);
-	cout << "workshopData.size(): " << workshopData.size()<<endl;
 	for (int i = 0; i < amountWorkInWorkshop; i++)
 		serializeWorkInWorkshop(workshopData, workInWorkshop, i);
-	cout << "openWorkInWorkshop: \n" << workshopData[0].orderNumber;
 	printWorkInWorkshop(workshopData, fileName);
 }
 
@@ -297,7 +238,6 @@ json getWorkInWorkshop(string fileName)
 {
 	ifstream jsonFile(fileName, ifstream::binary);
 	bool isOpen = jsonFile.is_open();
-	//jsonFile.close();
 
 	if (isOpen)
 	{
@@ -311,7 +251,6 @@ json getWorkInWorkshop(string fileName)
 
 void serializeWorkInWorkshop(vector <WorkInWorkshop>& workshopData, json workInWorkshop, int i)
 {
-	cout << "i = " << i<<endl;
 	int orderNumber;
 	int performerServiceNumber;
 	int jobCode;
@@ -320,7 +259,7 @@ void serializeWorkInWorkshop(vector <WorkInWorkshop>& workshopData, json workInW
 	float price;
 	int numberCompletedUnitsMeasure;
 	float costWork;
-	cout << "serializeWorkInWorkshop\nworkInWorkshop: \n\n" << workInWorkshop << endl;
+
 	orderNumber = workInWorkshop[i]["orderNumber"].get<int>();
 	performerServiceNumber = workInWorkshop[i]["performerServiceNumber"].get<int>();
 	jobCode = workInWorkshop[i]["jobCode"].get<int>();
@@ -340,53 +279,6 @@ void serializeWorkInWorkshop(vector <WorkInWorkshop>& workshopData, json workInW
 		numberCompletedUnitsMeasure,
 		costWork
 		});
-	////workshopData пустой при добавлении записи?
-	////ГДЕ ТУТ ОШИБКА?
-	////cout << "json: \n" << workInWorkshop << endl;
-	////cout << "i = " << i << endl;
-
-	////int orderNumber = workInWorkshop[i]["orderNumber"].get<int>();
-	////Ошибка: JSON_THROW(type_error::create(302, concat("type must be number, but is ", j.type_name()), &j));
-	//int performerServiceNumber = workInWorkshop[i]["performerServiceNumber"];
-	////int jobCode[3];
-	//int unit = workInWorkshop[i]["unit"].get<int>();
-	///*float normOfTime[3];
-	//float price[3];
-	//int numberCompletedUnitsMeasure[3];
-	//float costWork;*/
-
-	//*workshopData[i].orderNumber = workInWorkshop[i]["orderNumber"].get<int>();
-	////cout << "orderNumber: " << *workshopData[i].orderNumber << endl;
-
-	////тут проблема и. Скорее всего тип который берём это int, а не string (если так то не работает)
-
-	////работает
-	////*workshopData[i].performerServiceNumber = "test";
-
-	////не работает.
-	////РЕШЕНА))))))
-	//*workshopData[i].performerServiceNumber = performerServiceNumber;
-	////cout << "performerServiceNumber: " << workInWorkshop[i]["performerServiceNumber"].get<int>() << endl;
-
-	//*workshopData[i].jobCode = workInWorkshop[i]["jobCode"].get<int>();
-	////cout << "jobCode: " << *workshopData[i].jobCode << endl;
-
-	////и тут проблема:)
-	////А тут ещё не решена ((((
-	//*workshopData[i].unit = unit;
-	////cout << "unit: " << workInWorkshop[i]["unit"].get<int>() << endl;
-
-	//*workshopData[i].normOfTime = workInWorkshop[i]["normOfTime"].get<float>();
-	////cout << "normOfTime: " << *workshopData[i].normOfTime << endl;
-
-	//*workshopData[i].price = workInWorkshop[i]["price"].get<float>();
-	////cout << "price: " << *workshopData[i].price << endl;
-
-	//*workshopData[i].numberCompletedUnitsMeasure = workInWorkshop[i]["numberCompletedUnitsMeasure"].get<int>();
-	////cout << "numberCompletedUnitsMeasure: " << *workshopData[i].numberCompletedUnitsMeasure << endl;
-
-	//workshopData[i].costWork = workInWorkshop[i]["costWork"].get<float>();
-	////cout << "costWork: " << workshopData[i].costWork << endl;
 }
 
 void addFromJsonToWorkInWorkshop(int key, string item)
@@ -396,7 +288,6 @@ void addFromJsonToWorkInWorkshop(int key, string item)
 void createWorkInWorkshop(vector <WorkInWorkshop>& workshopData, string fileName)
 {
 	int amountWorkInWorkshop = getAmountWorkInWorkshop(fileName);
-	//int performerServiceNumber;
 	json jsonData{};
 	string userResponse;
 
@@ -446,28 +337,6 @@ void createWorkInWorkshop(vector <WorkInWorkshop>& workshopData, string fileName
 				jsonData[i]["price"] = price;
 				jsonData[i]["numberCompletedUnitsMeasure"] = numberCompletedUnitsMeasure;
 				jsonData[i]["costWork"] = costWork;
-
-				//*workshopData[i].orderNumber = rand() % 9999;
-
-				//performerServiceNumber = requestPerformerServiceNumberForCreateWorkshopData(i);
-				//*workshopData[i].performerServiceNumber = performerServiceNumber;
-
-				//*workshopData[i].jobCode = rand() % 999;
-				////*workshopData[i].unit = getRandomStr(5);
-				//*workshopData[i].unit = rand() % 9999;
-				//*workshopData[i].normOfTime = (float)(rand()) / ((float)(RAND_MAX / 9));
-				//*workshopData[i].price = (float)(rand()) / ((float)(RAND_MAX / 9));
-				//*workshopData[i].numberCompletedUnitsMeasure = rand() % 999;
-				//workshopData[i].costWork = *workshopData[i].price * *workshopData[i].numberCompletedUnitsMeasure;
-
-				//jsonData[i]["orderNumber"] = *workshopData[i].orderNumber;
-				//jsonData[i]["performerServiceNumber"] = performerServiceNumber;
-				//jsonData[i]["jobCode"] = *workshopData[i].jobCode;
-				//jsonData[i]["unit"] = *workshopData[i].unit;
-				//jsonData[i]["normOfTime"] = *workshopData[i].normOfTime;
-				//jsonData[i]["price"] = *workshopData[i].price;
-				//jsonData[i]["numberCompletedUnitsMeasure"] = *workshopData[i].numberCompletedUnitsMeasure;
-				//jsonData[i]["costWork"] = workshopData[i].costWork;
 			}
 			break;
 		}
@@ -521,58 +390,12 @@ void createWorkInWorkshop(vector <WorkInWorkshop>& workshopData, string fileName
 				jsonData[i]["numberCompletedUnitsMeasure"] = numberCompletedUnitsMeasure;
 				jsonData[i]["costWork"] = costWork;
 			}
-			/*int orderNumber[4];
-			int performerServiceNumber[6];
-			int jobCode[3];
-			int unit[5];
-			float normOfTime[3];
-			float price[3];
-			int numberCompletedUnitsMeasure[3];
-			float costWork;
-
-			for (int i = 0; i < amountWorkInWorkshop; i++)
-			{
-				cout << "Введите данные" << endl;
-
-				cout << "Номер наряда (целые числа, небольше 4 символов):" << endl;
-				cin >> *orderNumber;
-
-				cout << "Табельный номер исполнителя (строка, небольше 6 символов):" << endl;
-				cin >> *performerServiceNumber;
-
-				cout << "Код работы (целые числа, небольше 3 символов):" << endl;
-				cin >> *jobCode;
-
-				cout << "Единица измерения (строка, небольше 5 символов):" << endl;
-				cin >> *unit;
-
-				cout << "Норма времени ч. (вещественное число, небольше 3 символов):" << endl;
-				cin >> *normOfTime;
-
-				cout << "Расценка руб. коп. (вещественное число, небольше 3 символов):" << endl;
-				cin >> *price;
-
-				cout << "Расценка руб. коп. (целое число, небольше 3 символов):" << endl;
-				cin >> *numberCompletedUnitsMeasure;
-
-				costWork = *price * *numberCompletedUnitsMeasure;
-
-				jsonData[i]["orderNumber"] = *orderNumber;
-				jsonData[i]["performerServiceNumber"] = *performerServiceNumber;
-				jsonData[i]["jobCode"] = *jobCode;
-				jsonData[i]["unit"] = *unit;
-				jsonData[i]["normOfTime"] = *normOfTime;
-				jsonData[i]["price"] = *price;
-				jsonData[i]["numberCompletedUnitsMeasure"] = *numberCompletedUnitsMeasure;
-				jsonData[i]["costWork"] = costWork;
-			}*/
 			break;
 		}
 
 		if (userResponse != "y" && userResponse != "n")
 			cout << "Не корректный ввод" << endl;
 	}
-	cout << "jsonData: " << jsonData << endl;
 	createJsonFile(jsonData, fileName);
 }
 
@@ -625,7 +448,6 @@ void printWorkInWorkshop(vector <WorkInWorkshop>& workshopData, string fileName)
 		<< setw(34) << "|Стоимость работы (р/к)|"
 		<< endl;
 
-	//cout << "amountWorkshopData sizeof: " << amountWorkshopData << endl;
 	for (int i = 0; i < workshopData.size(); i++)
 	{
 		cout
@@ -675,7 +497,7 @@ void copySelectedArtist(vector <WorkInWorkshop>& workshopData,
 	float price;
 	int numberCompletedUnitsMeasure;
 	float costWork;
-	//cout << "serializeWorkInWorkshop\nworkInWorkshop: \n\n" << workInWorkshop << endl;
+
 	orderNumber = workshopData[i].orderNumber;
 	performerServiceNumber = workshopData[i].performerServiceNumber;
 	jobCode = workshopData[i].jobCode;
